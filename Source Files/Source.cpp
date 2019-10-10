@@ -29,6 +29,8 @@
 			non exaustives filtrées pour mettre en avant le potentiel de 
 			chaque fonction.
 
+	Notes :
+			x est l'axe de gauche à droite, y est l'axe de haut en bas
 
 	Basé sur le projet et la doc :
 	https://www.sfml-dev.org/documentation/2.5.1/
@@ -140,6 +142,27 @@ int main()
 		return EXIT_FAILURE;
 
 	/*
+
+			SpritesSheets
+
+		Une spriteSheet est une image qui est divisée en sous images qui représentent 
+		souvent le même objet dans des états différents.
+		Elle est decoupée de manière ultra précise pour permettre de simuler une 
+		animation.
+
+		Ici on a une image divisée en un tableau de 3 colonnes et 4 lignes et je 
+		n'utilise qu'une ligne.
+
+		Pour ne garder qu'une portion à la fois, on crée un rectangle appelé 
+		SpriteImage qui delimite les pixels à afficher.
+
+	
+	*/
+	int ImageParLigne = 3;
+	int ImageParColonne = 4;
+	Vector2u textureSize = texture.getSize();
+	IntRect SpriteImage(0, 0, (textureSize.x / ImageParLigne), (textureSize.y / ImageParColonne));
+	/*
 		Représentation dessinable d'une texture 
 		(que l'on peut déplacer dans la fenêtre à notre guise par exemple)
 		Elle hérite de deux classes appelés Transformable et Drawable
@@ -189,8 +212,8 @@ int main()
 		https://www.sfml-dev.org/documentation/2.5.1/classsf_1_1Sprite.php#aa795483096b90745b2e799532963e271
 	
 	*/
-	IntRect SpriteImage(0, 0, 200, 200);
 	Sprite sprite(texture, SpriteImage);
+	
 
 	/*
 	
@@ -299,48 +322,84 @@ int main()
 		On utilise la clock pour gérer les animations et les frequences d'execution
 
 		Usage :
-		instantiation
 
 			Clock clock;	// cela démarre le décompte
 
-			Time maintenant = clock.getElapsedTime() // cela permet de savoir combien de temps s'est passé depuis le debut du decompte
+			Time maintenant = clock.getElapsedTime() // cela permet de savoir combien de 
+											temps s'est passé depuis le debut du decompte
 			
-			// on peut comparer maintenant à la durée normale d'execution pour savoir si c'est le moment de faire le calcul du contenu
+			// on peut comparer maintenant à la durée normale d'execution pour savoir si
+											c'est le moment de faire le calcul du contenu
 			
 			clock.restart() // cela permet de redémarrer le décompte
 
+
+		Note : Plusieurs éléments peuvent etre traités à des fréquences différentes, il 
+							est tout a fait possible de créer plusieurs clocks pour cela.
 		
 	*/
 	Clock calculClock;
 	// 60 executions par seconde en miliseconde = 16,6666666
 	Int32 calculFrequence = 16.666;
 
-
+	Clock animationClock;
+	float animationFrequence = 0.2; // changement d'image toutes les secondes
 
 
 	/*
 
 		Code personnel pour l'annimation
 
-		Notes :
-			x est l'axe de gauche à droite, y est l'axe de haut en bas
+		ATTENTION :
+			Cette partie est vraiment faite à ma sauce et non selon le template donné par
+			la doc, C'est intéressant à comprendre, mais les patterns peuvent etre peu
+			optimisés.
+
+		Les classes Rect et FloatRect possèdent une fonction .intersect(rect) qui permet
+		de savoir s'ils intersectent avec d'autres rectangles.
+		Ainsi, on utilise des rectangles au niveau des bords de la fenetre et l'on observe
+		si la sprite intersectionne avec eux pour changer sa direction.
 
 	*/
-	Vector2f largeurfenêtre,temp(window.getSize()),direction;
+	//Gérer le dimensionnement de la fenêtre permet de mieux placer les bords
+	Vector2f largeurfenêtre, temp(window.getSize());
 	largeurfenêtre = temp;
+
+	//SpriteBox me permet de garder en mémoire la position de ma sprite pour tester les 
+	//collisions
 	FloatRect spriteBox;
-	Rect<float> bordHaut(0, 0, largeurfenêtre.x, 10),
+
+	//Les bords me servent pour détecter les intersections
+	FloatRect bordHaut(0, 0, largeurfenêtre.x, 10),
 		bordBas(0, largeurfenêtre.y - 10, largeurfenêtre.x, 10), 
 		bordDroite(largeurfenêtre.x - 10, 0, 10, largeurfenêtre.y),
 		bordGauche(0, 0, 10, largeurfenêtre.y);
 	
+	/*
+	
+		Gestion de la vitesse
+
+		Dans notre cas :
+			L'objet en mouvement diagonal constant, donc on ne se préoccupe pas des variations
+			de vitesse
+
+		Dans le cas d'un usage de fleches haut,bas,gauche,droite :
+			si une seule direction est demandée
+				la vitesse appliquée dans la direction est totale
+
+			si deux directions sont demandées (haut + droite par exemple)
+				la vitesse à appliquer sur chaque axe est sqrt( pow(Vitesse,2) / 2 )
+
+		Dans le cas d'un joystick analogique 
+			les informations données par le joystick devraient suffir.
+
+	*/
 	float vitesse = 2;
-	int bas, droite;
-	bas = droite = true;
+	int deltaY, deltaX,horizontal,vertical;
 
 
 
-	// Vous pouvez instancier autant de choses que vous voulez ici
+
 #pragma endregion
 
 
@@ -370,153 +429,148 @@ int main()
 
 		/*
 		
-			Dans le contexte de ce bete exercice,
-			seul une gestion des événements est nécéssaire.
-
-			Dans un projet à plus grande echelle,
-			de nombreuses actions sont indépendantes des inputs du jouers.
-
-			ils seront gérés différements du pattern suivant.
+			Traitement des événements
 
 		*/
 		#pragma region evenements
 
-				/*
+			/*
 				
-					Classe Event
+				Classe Event
 
-					Classe mère de tous les événements possibles
-
-
-					les sources d'événement sont :
-						joystik (input, connection...), clavier, sourie(click, mouvement, 
-						molette), capteurs en tout genre, la fenêtre en elle meme 
-						(redimension, saisie de texte, touché) ... (non exaustif)
+				Classe mère de tous les événements possibles
 
 
-					Usage et fonctionnement des événements :
-						détaillé dans le commentaire en dessous 
+				les sources d'événement sont :
+					joystik (input, connection...), clavier, sourie(click, mouvement, 
+					molette), capteurs en tout genre, la fenêtre en elle meme 
+					(redimension, saisie de texte, touché) ... (non exaustif)
 
 
-					La liste exacte des type d'événement est :
+				Usage et fonctionnement des événements :
+					détaillé dans le commentaire en dessous 
+
+
+				La liste exacte des type d'événement est :
 						
-							Closed			(émit à la fermeture de la fenêtre)
+						Closed			(émit à la fermeture de la fenêtre)
 								
-							Resized			(émit quand la fenêtre est redimenssionnée)
+						Resized			(émit quand la fenêtre est redimenssionnée)
 							
-							LostFocus		(émit si l'utilisateur clique en dehors de 
-											la fenêtre)
+						LostFocus		(émit si l'utilisateur clique en dehors de 
+										la fenêtre)
 							
-							GainedFocus		(émit après un LostFocus si l'utilisateur 
-											reclique sur la fenêtre)
+						GainedFocus		(émit après un LostFocus si l'utilisateur 
+										reclique sur la fenêtre)
 							
-							TextEntered		(émit quand un caractère est tapé)
+						TextEntered		(émit quand un caractère est tapé)
 							
-							KeyPressed		(émit quand une touche est appuyée)
+						KeyPressed		(émit quand une touche est appuyée)
 
-							KeyReleased		(émit quand une touche est relachée)
+						KeyReleased		(émit quand une touche est relachée)
 							
-							MouseWheelMoved			(NE PAS UTILISER, cet event va etre 
-													supprimé dans les prochaines 
-													versions)
+						MouseWheelMoved			(NE PAS UTILISER, cet event va etre 
+												supprimé dans les prochaines 
+												versions)
 							
-							MouseWheelScrolled		(émit au scroll de la molette)
+						MouseWheelScrolled		(émit au scroll de la molette)
 
-							MouseButtonPressed		(émit quand le bouton de la sourie 
-													est appuyée)
+						MouseButtonPressed		(émit quand le bouton de la sourie 
+												est appuyée)
 							
-							MouseButtonReleased		(émit quand le bouton de la sourie 
-													est relachée)
+						MouseButtonReleased		(émit quand le bouton de la sourie 
+												est relachée)
 							
-							MouseMoved		(émit au déplacement de sourie)
+						MouseMoved		(émit au déplacement de sourie)
 							
-							MouseEntered	(émit quand la sourie entre dans le cadre de 
-											la fenêtre)
+						MouseEntered	(émit quand la sourie entre dans le cadre de 
+										la fenêtre)
 
-							MouseLeft		(émit quand la sourie sors du le cadre de la 
-											fenêtre)
+						MouseLeft		(émit quand la sourie sors du le cadre de la 
+										fenêtre)
 							
-							JoystickButtonPressed	(émit quand un bouton du joystick
-													est appuyé)
+						JoystickButtonPressed	(émit quand un bouton du joystick
+												est appuyé)
 							
-							JoystickButtonReleased	(émit quand un bouton du joystick 
-													est relaché)
+						JoystickButtonReleased	(émit quand un bouton du joystick 
+												est relaché)
 
-							joystickMoved		(émit quand un joystick se deplace sur un
-												axe)
+						joystickMoved		(émit quand un joystick se deplace sur un
+											axe)
 													
-							JoystickConnected		(émit quand un joystick est connecté)
+						JoystickConnected		(émit quand un joystick est connecté)
 													
-							JoystickDisconnected	(émit quand un joystick est
-													déconnecté)
+						JoystickDisconnected	(émit quand un joystick est
+												déconnecté)
 													
-							TouchBegan		(émit quand quelqu'un pose un doigt sur une 
-											surface tactile)
+						TouchBegan		(émit quand quelqu'un pose un doigt sur une 
+										surface tactile)
 													
-							TouchMoved		(émit quand quelqu'un deplace un doigt sur 
-											une surface tactile)
+						TouchMoved		(émit quand quelqu'un deplace un doigt sur 
+										une surface tactile)
 													
-							TouchEnded		(émit quand quelqu'un enlève un doigt d'une 
-											surface tactile)
+						TouchEnded		(émit quand quelqu'un enlève un doigt d'une 
+										surface tactile)
 													
-							SensorChanged	(émit quand la valeur d'un capteur change)
+						SensorChanged	(émit quand la valeur d'un capteur change)
 													
-							Count			(retourne le nombre de type d'Event...
-											inutile ?)
+						Count			(retourne le nombre de type d'Event...
+										inutile ?)
 
-					Les types sont obtenus avec Event::EventType et chaque événement a son
-					type définis dans event.type 
+				Les types sont obtenus avec Event::EventType et chaque événement a son
+				type définis dans event.type 
 
-					(PS, certains événements incluent des informations, voir DOC)
+				(PS, certains événements incluent des informations, voir DOC)
 
-					DOC:
-					https://www.sfml-dev.org/documentation/2.5.1/classsf_1_1Event.php#af41fa9ed45c02449030699f671331d4aa67fd26d7e520bc6722db3ff47ef24941
+				DOC:
+				https://www.sfml-dev.org/documentation/2.5.1/classsf_1_1Event.php#af41fa9ed45c02449030699f671331d4aa67fd26d7e520bc6722db3ff47ef24941
 				
-				*/
-				Event event;
-				/*
+			*/
+			Event event;
+			/*
 					
-					Traitement des événements
+				Traitement des événements
 
-					general :
+				general :
 
-						Lorsqu'un événement a lieux, il est stocké dans une liste 
-						d'Events. la fonction window.pollEvent(event) récupère le premier 
-						evenement  de cette liste et le met dans la variable event. S'il
-						n'y a pas d'événements à traiter, elle retourne false.
+					Lorsqu'un événement a lieux, il est stocké dans une liste 
+					d'Events. la fonction window.pollEvent(event) récupère le premier 
+					evenement  de cette liste et le met dans la variable event. S'il
+					n'y a pas d'événements à traiter, elle retourne false.
 
-					le principe du while :
+				le principe du while :
 
-						Ce pattern de while(window.pollEvent(event)) permet de traiter 
-						chaque événements intervenu depuis l'execution précédente s'il 
-						y en a eu.
+					Ce pattern de while(window.pollEvent(event)) permet de traiter 
+					chaque événements intervenu depuis l'execution précédente s'il 
+					y en a eu.
 
-					l'interrieur du while :
+				l'interrieur du while :
 
-						On devrait utiliser un switch pour tester toutes les valeurs
-						possible pour le type d'événement afin de traiter tous les 
-						événements possibles.
+					On devrait utiliser un switch pour tester toutes les valeurs
+					possible pour le type d'événement afin de traiter tous les 
+					événements possibles.
 					
-				*/
-				while (window.pollEvent(event))
+			*/
+			while (window.pollEvent(event))
+			{
+
+				// Fermeture de la fenêtre  => fin du programme
+				if (event.type == Event::Closed)
+					window.close();
+
+				// Redimension de la fenêtre
+				if (event.type == Event::Resized)
 				{
+					Vector2f  temp(window.getSize());
+					largeurfenêtre = temp;
 
-					// Fermeture de la fenêtre  => fin du programme
-					if (event.type == Event::Closed)
-						window.close();
-
-					// Redimension de la fenêtre
-					if (event.type == Event::Resized)
-					{
-						Vector2f  temp(window.getSize());
-						largeurfenêtre = temp;
-
-						Rect<float> bordHaut(0, 0, largeurfenêtre.x, 10),
-							bordBas(0, largeurfenêtre.y - 10, largeurfenêtre.x, 10),
-							bordDroite(largeurfenêtre.x - 10, 0, 10, largeurfenêtre.y),
-							bordGauche(0, 0, 10, largeurfenêtre.y);
-					}
+					// on réadapte la position des bords
+					Rect<float> bordHaut(0, 0, largeurfenêtre.x, 10),
+						bordBas(0, largeurfenêtre.y - 10, largeurfenêtre.x, 10),
+						bordDroite(largeurfenêtre.x - 10, 0, 10, largeurfenêtre.y),
+						bordGauche(0, 0, 10, largeurfenêtre.y);
 				}
+			}
 
 
 		#pragma endregion
@@ -524,40 +578,54 @@ int main()
 
 		#pragma region comportement
 
-				//cout << endl << clock.getElapsedTime().asMilliseconds() << " " << calculFrequence << endl;
-				if (calculClock.getElapsedTime().asMilliseconds() >= calculFrequence) {
-					cout << endl << calculClock.getElapsedTime().asMilliseconds() << " " << calculFrequence << endl;
+			/*
+				Gestion de frequence
 
-					spriteBox = sprite.getGlobalBounds();
+				La boucle while s'execute autant que possible, et ce n'est pas ce qu'on veux
+				Le if permet d'attendre le bon moment pour éxécuter le traitement
+			
+			*/
 
-					cout  << largeurfenêtre.x << " " << largeurfenêtre.y << endl;;
+			//60FPS -> processus de positionnement
+			if (calculClock.getElapsedTime().asMilliseconds() >= calculFrequence) {
+				
+				//on récupère la position du sprite
+				spriteBox = sprite.getGlobalBounds();
 
-					cout << "Sprite Box : " << spriteBox.top << " " << spriteBox.left << endl;
+				//On spécifie une nouvelle direction quand on intersectionne avec un mur
+				if (spriteBox.intersects(bordBas)) // si on percute le bord bas
+					vertical = -1; 
+				else if (spriteBox.intersects(bordHaut)) // si on percute le bord haut
+					vertical = 1;
+
+				if (spriteBox.intersects(bordDroite)) // si on percute le bord droite
+					horizontal = -1;
+				else if (spriteBox.intersects(bordGauche)) // si on percute le bord gauche
+					horizontal = 1;
 
 
-					if (spriteBox.intersects(bordBas))
-						bas = -1 * vitesse;
-					else if (spriteBox.intersects(bordHaut))
-						bas = 1 * vitesse;
+				// On applique la vitesse
+				deltaX = horizontal * vitesse;
+				deltaY = vertical * vitesse;
+				
 
-					if (spriteBox.intersects(bordDroite))
-						droite = -1 * vitesse;
-					else if (spriteBox.intersects(bordGauche))
-						droite = 1 * vitesse;
+				//On applique le mouvement à la sprite
+				sprite.move(deltaX, deltaY);
 
-					
+				calculClock.restart();
+			}
 
-					cout << bas << " " << droite << endl;
 
-					direction.x = droite;
-					direction.y = bas;
+			//1FPS -> annimation de l'image
+			if (animationClock.getElapsedTime().asSeconds() >= animationFrequence) {
 
-					sprite.move(0, 0);
-					sprite.move(droite, bas);
+				//Ici on décalle le cadre qui masque la texture de x;
+				SpriteImage.left = (SpriteImage.left + (textureSize.x / ImageParLigne)) % textureSize.x;
+				//et on applique la nouvelle image
+				sprite.setTextureRect(SpriteImage);
 
-					calculClock.restart();
-				}
-
+				animationClock.restart();
+			}
 
 		#pragma endregion
 
@@ -583,31 +651,31 @@ int main()
 
 
 
-			/*
-				Efface la scene precedente
+		/*
+			Efface la scene precedente
 
-				On remplace alors toute la fenêtre par une seule couleur
-				Par defaut c'est noir.
+			On remplace alors toute la fenêtre par une seule couleur
+			Par defaut c'est noir.
 
-			*/
-			window.clear(Color(0,255,0,255));
+		*/
+		window.clear(Color(0,255,0,255));
 
-			/*
-				Dessin de tout les éléments qui héritent de la Classe drawable
+		/*
+			Dessin de tout les éléments qui héritent de la Classe drawable
 
-				ATTENTION !
-					Plus un élément est appelé tot dans l'ordre des draw, plus 
-					il risque d'etre masqué par d'autres éléments.
+			ATTENTION !
+				Plus un élément est appelé tot dans l'ordre des draw, plus 
+				il risque d'etre masqué par d'autres éléments.
 
-					par exemple, le ciel/arrièrePlan doit toujours etre dessiné en premier 
-					et (sauf cas exceptionnel) l'interface utilisateur en dernier.
+				par exemple, le ciel/arrièrePlan doit toujours etre dessiné en premier 
+				et (sauf cas exceptionnel) l'interface utilisateur en dernier.
 
-			*/
-			window.draw(sprite);
-			window.draw(text);
+		*/
+		window.draw(sprite);
+		window.draw(text);
 		
-			//Met a jour la fenêtre
-			window.display();
+		//Met a jour la fenêtre
+		window.display();
 
 	#pragma endregion
 
