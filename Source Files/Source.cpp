@@ -6,16 +6,16 @@
 
 	Principe :
 
-			C'est un code fonctionnel ou chaque fonction est documentée.
-			De plus, même la structure est commentée.
+			C'est un code fonctionnel ou chaque fonction est documentÃ©e.
+			De plus, mÃªme la structure est commentÃ©e.
 
 
 	Comment l'utiliser :
 
-			1) Réduisez tout les commentaires en minuscule pour voir le 
+			1) RÃ©duisez tout les commentaires en minuscule pour voir le 
 			code brute.
 
-			2) réduisez les pragma pour voir les différentes section de code
+			2) rÃ©duisez les pragma pour voir les diffÃ©rentes section de code
 			
 			3) Ouvrez les pragma et les commentaires qui vous interessent pour
 			lire la documentation
@@ -23,14 +23,14 @@
 
 	Attention :
 
-			Ici sont proposés des fonctions et usages ainsi que des 
+			Ici sont proposÃ©s des fonctions et usages ainsi que des 
 			explications dans chaque commentaires. Ce sont des explications
-			basées sur mon interpretation personnelle et des listes
-			non exaustives filtrées pour mettre en avant le potentiel de 
+			basÃ©es sur mon interpretation personnelle et des listes
+			non exaustives filtrÃ©es pour mettre en avant le potentiel de 
 			chaque fonction.
 
 
-	Basé sur le projet et la doc :
+	BasÃ© sur le projet et la doc :
 	https://www.sfml-dev.org/documentation/2.5.1/
 */
 
@@ -41,12 +41,12 @@
 using namespace std;
 
 /*
-	/!\ toutes les fonctions sfml sont préfixées par sf::
-	utiliser cette fonction permet de supprimer ce prefixage pour une meilleure lisibilité
+	/!\ toutes les fonctions sfml sont prÃ©fixÃ©es par sf::
+	utiliser cette fonction permet de supprimer ce prefixage pour une meilleure lisibilitÃ©
 
-	  BEST PRACTICE : Si vous etes amenés à #include beaucoups de librairies différentes, 
-	  le sf:: peut avoir son intérêt si plusieurs librairies appellent leur fonction de
-	  manière similaire
+	  BEST PRACTICE : Si vous etes amenÃ©s Ã  #include beaucoups de librairies diffÃ©rentes, 
+	  le sf:: peut avoir son intÃ©rÃªt si plusieurs librairies appellent leur fonction de
+	  maniÃ¨re similaire
 */
 using namespace sf;
 
@@ -56,19 +56,19 @@ int main()
 /*
 		Initialisation :
 
-		Comme un programme normal, on commence ici par créer les éléments à utiliser 
+		Comme un programme normal, on commence ici par crÃ©er les Ã©lÃ©ments Ã  utiliser 
 		durant la boucle d'execution.
 	
-		C'est la partie qui s'execute derrière le chargement initial d'un jeu ou d'un 
+		C'est la partie qui s'execute derriÃ¨re le chargement initial d'un jeu ou d'un 
 		programme.
 */
 #pragma region Initialisation
 	/*
-		Créer la fenetre principale
+		CrÃ©er la fenetre principale
 	
 		Ordre des dimensions initiales : largeur, hauteur 
-		paramêtre optionnel : ModeBitsPerPixel 
-			(je ne sais pas ce que c'est ?) défaut : 32
+		paramÃªtre optionnel : ModeBitsPerPixel 
+			(je ne sais pas ce que c'est ?) dÃ©faut : 32
 
 
 		Ce qu'on peut faire avec :
@@ -79,7 +79,7 @@ int main()
 
 			Prendre une photo -> window.capture()
 
-			Connaitre et modifier sa position à l'écran (utiles pour des puzzles avec 
+			Connaitre et modifier sa position Ã  l'Ã©cran (utiles pour des puzzles avec 
 			plusieurs fenetres) 
 				-> window.getPosition()
 				-> window.setPosition(votrePosition)	//Voir doc pour les types requis
@@ -99,8 +99,8 @@ int main()
 
 	/*
 
-		Chargement en mémoire des Textures 
-		C'est une ressource qui sera appelé plus tard.
+		Chargement en mÃ©moire des Textures 
+		C'est une ressource qui sera appelÃ© plus tard.
 
 		(Visual Studio)
 		Pour importer des images : drag and drop dans le dossier 
@@ -116,13 +116,13 @@ int main()
 				possibles
 
 			tester et appliquer un filtre smooth (utile pour sauver les meubles avec 
-			des textures de mauvaise qualité)
-				-> texture.setSmooth(booléain vrai ou faux)
+			des textures de mauvaise qualitÃ©)
+				-> texture.setSmooth(boolÃ©ain vrai ou faux)
 				-> texture.isSmooth()
 
-			tester ou activer la répétition (utile pour les parois ou motifs repetitifs)
+			tester ou activer la rÃ©pÃ©tition (utile pour les parois ou motifs repetitifs)
 				-> texture.isRepeated()
-				-> texture.setRepeated(booléain vrai ou faux)
+				-> texture.setRepeated(boolÃ©ain vrai ou faux)
 
 			...
 
@@ -139,45 +139,45 @@ int main()
 		return EXIT_FAILURE;
 
 	/*
-		Représentation dessinable d'une texture 
-		(que l'on peut déplacer dans la fenêtre à notre guise par exemple)
-		Elle hérite de deux classes appelés Transformable et Drawable
+		ReprÃ©sentation dessinable d'une texture 
+		(que l'on peut dÃ©placer dans la fenÃªtre Ã  notre guise par exemple)
+		Elle hÃ©rite de deux classes appelÃ©s Transformable et Drawable
 
 
 		Ce qu'on peut faire avec :
 
-			Créer une sprite à partir d'une partie de texture (utile pour des textures 
-			contenant différentes sprites)
+			CrÃ©er une sprite Ã  partir d'une partie de texture (utile pour des textures 
+			contenant diffÃ©rentes sprites)
 				-> sprite(texture, vosDimension)	//Voir doc pour les types requis
-				ou après sprite(texture)
+				ou aprÃ¨s sprite(texture)
 				-> sprite.setTextureRect(vosDimension)	//Voir doc pour les types requis
 			 
 			Obtenir les bords de l'image (utile pour le calcul de colisions)
-				-> sprite.getGlobalBounds()	//Voir doc pour les types utilisés
+				-> sprite.getGlobalBounds()	//Voir doc pour les types utilisÃ©s
 
-				(Vous verrez une différence entre coordonnées Locales et Globales, demandez 
+				(Vous verrez une diffÃ©rence entre coordonnÃ©es Locales et Globales, demandez 
 				moi de l'aide pour des explications si besoin)
 
-			Deplacer la sprite (Hérité de la classe Transformable)
+			Deplacer la sprite (HÃ©ritÃ© de la classe Transformable)
 				-> sprite.move(VotreDirection)	//Voir doc pour les types requis
-				(Incrémentation : utile pour les deplacements)
+				(IncrÃ©mentation : utile pour les deplacements)
 				ou 
 				-> sprite.setPostition(VotrePosition)	//Voir doc pour les types requis
-				(reecriture : utile pour les téléportations)
+				(reecriture : utile pour les tÃ©lÃ©portations)
 
-			Tourner la sprite (Hérité de la classe Transformable)
+			Tourner la sprite (HÃ©ritÃ© de la classe Transformable)
 				-> sprite.rotate(VotreRotation)	//Voir doc pour les types requis
-				(Incrémentation : utile pour les animations de rotation)
+				(IncrÃ©mentation : utile pour les animations de rotation)
 				ou
 				-> sprite.setRotation(VotreRotation)	//Voir doc pour les types requis
-				(reecriture : utile pour réinitialiser la rotation)
+				(reecriture : utile pour rÃ©initialiser la rotation)
 
-			Redimensionner la sprite (Hérité de la classe Transformable)
+			Redimensionner la sprite (HÃ©ritÃ© de la classe Transformable)
 				-> sprite.scale(vosFacteurs)	//Voir doc pour les types requis
-				(Incrémentation : utile pour les animations de taille)
+				(IncrÃ©mentation : utile pour les animations de taille)
 				ou
 				-> sprite.setScale(vosFacteurs)	//Voir doc pour les types requis
-				(reecriture : utile pour réinitialiser une taille)
+				(reecriture : utile pour rÃ©initialiser une taille)
 				
 
 			...
@@ -194,14 +194,14 @@ int main()
 	
 		La classe Font permet de manipuler des polices d'ecriture
 		
-		En dehors d'utiliser la police pour écrire du texte, et du chargement de police,
+		En dehors d'utiliser la police pour Ã©crire du texte, et du chargement de police,
 		on ne peut pas la modifier.
-		Seul la lecture d'informations particulières, comme les mesures en px de details,
-		peut etre utile (et encore uniquement pour un usage esthétique).
+		Seul la lecture d'informations particuliÃ¨res, comme les mesures en px de details,
+		peut etre utile (et encore uniquement pour un usage esthÃ©tique).
 
 		ATTENTION :
-			Les polices "bipmap" peuvent causer problème, cherchez une version vectorielle
-			à la place
+			Les polices "bipmap" peuvent causer problÃ¨me, cherchez une version vectorielle
+			Ã  la place
 
 		DOC :
 		https://www.sfml-dev.org/documentation/2.5.1/classsf_1_1Font.php
@@ -209,20 +209,20 @@ int main()
 	*/
 	Font font;
 	//On charge la police, si ca marche, tout va bien, sinon on plante
-	if (!font.loadFromFile("arial.ttf"))
+	if (!font.loadFromFile("Mansalva-Regular.ttf"))
 		return EXIT_FAILURE;
 
 	/*
 	
 		Affichage de Texte
 
-		paramêtres de constructeur : Texte à écrire, police, et taille en pixel d'un 
-		caractère (defaut à 30)
+		paramÃªtres de constructeur : Texte Ã  Ã©crire, police, et taille en pixel d'un 
+		caractÃ¨re (defaut Ã  30)
 		text("Hello SFML", font, 50);
 
 		Ce qu'on peut faire avec :
 				
-				Paramêtrer l'affichage des caractères
+				ParamÃªtrer l'affichage des caractÃ¨res
 					-> text.setCharacterSize(VotreDimension)	
 								//Voir doc pour les types requis
 					ou
@@ -234,7 +234,7 @@ int main()
 					...
 
 
-				modifier l'aspect cosmétique du texte
+				modifier l'aspect cosmÃ©tique du texte
 					-> text.setStyle(VotreStyle)	//Voir doc pour les types requis
 					ou
 					-> text.setColor(VotreCouleur)	//Voir doc pour les types requis
@@ -250,29 +250,29 @@ int main()
 	Text text("Hello SFML", font, 50);
 
 	/*
-		La musique est une classe fille héritant d'un ensemble de classes
-		Music -> SoundStream -> SoundSource -> AlResource (basé sur openAL, voir doc)
+		La musique est une classe fille hÃ©ritant d'un ensemble de classes
+		Music -> SoundStream -> SoundSource -> AlResource (basÃ© sur openAL, voir doc)
 
-		OpenAL permet de faire du son spacialisé dans un environement 3D, certaines 
+		OpenAL permet de faire du son spacialisÃ© dans un environement 3D, certaines 
 		fonctions de cette classe vont dans ce sens (set/getPosition,
 		setRelativeToListener, get/setMinDistance....). 
 
 
 		Ce qu'on peut faire avec :
 				
-				gérer une répétition (utile pour les musiques d'embiance)
+				gÃ©rer une rÃ©pÃ©tition (utile pour les musiques d'embiance)
 					-> music.setLoopPoints(votreParam)	//Voir doc pour les types requis
 					ou
 					-> music.getLoopPoints()
 
-				Jouer la musique, la mettre en pause ou l'arreter et connaitre son état
+				Jouer la musique, la mettre en pause ou l'arreter et connaitre son Ã©tat
 				(utile par exemple pour arreter la musique d'embiance quand le menu est 
 				ouvert)
 					-> music.play(), music.pause(), music.stop()
 					ou
 					-> music.getStatus()
 
-				atténuer la musique (par exemple au travers d'un mur)
+				attÃ©nuer la musique (par exemple au travers d'un mur)
 					-> music.setAttenuation(votreParam)	//Voir doc pour les types requis
 					ou
 					-> music.getAttenuation()
@@ -298,7 +298,7 @@ int main()
 
 		Boucle d'execution ou RunTime :
 
-		C'est une boucle d'affichage qui s'execute à chaque image, ca peut etre à 60 
+		C'est une boucle d'affichage qui s'execute Ã  chaque image, ca peut etre Ã  60 
 		executions par seconde par exemple...
 
 */
@@ -310,8 +310,8 @@ int main()
 		
 			Section Logique
 
-			Tout ce qui concerne le traitement des inputs, déplacement des objets dans 
-			la scène et autre logique doit etre écrit avant l'affichage graphique du tout.
+			Tout ce qui concerne le traitement des inputs, dÃ©placement des objets dans 
+			la scÃ¨ne et autre logique doit etre Ã©crit avant l'affichage graphique du tout.
 		
 			Ce n'est pas obligatoire, c'est une bonne pratique. 
 
@@ -321,12 +321,12 @@ int main()
 		/*
 		
 			Dans le contexte de ce bete exercice,
-			seul une gestion des événements est nécéssaire.
+			seul une gestion des Ã©vÃ©nements est nÃ©cÃ©ssaire.
 
-			Dans un projet à plus grande echelle,
-			de nombreuses actions sont indépendantes des inputs du jouers.
+			Dans un projet Ã  plus grande echelle,
+			de nombreuses actions sont indÃ©pendantes des inputs du jouers.
 
-			ils seront gérés différements du pattern suivant.
+			ils seront gÃ©rÃ©s diffÃ©rements du pattern suivant.
 
 		*/
 		#pragma region evenements
@@ -335,89 +335,89 @@ int main()
 				
 					Classe Event
 
-					Classe mère de tous les événements possibles
+					Classe mÃ¨re de tous les Ã©vÃ©nements possibles
 
 
-					les sources d'événement sont :
+					les sources d'Ã©vÃ©nement sont :
 						joystik (input, connection...), clavier, sourie(click, mouvement, 
 						molette), capteurs en tout genre, la fenetre en elle meme 
-						(redimension, saisie de texte, touché) ... (non exaustif)
+						(redimension, saisie de texte, touchÃ©) ... (non exaustif)
 
 
-					Usage et fonctionnement des événements :
-						détaillé dans le commentaire en dessous 
+					Usage et fonctionnement des Ã©vÃ©nements :
+						dÃ©taillÃ© dans le commentaire en dessous 
 
 
-					La liste exacte des type d'événement est :
+					La liste exacte des type d'Ã©vÃ©nement est :
 						
-							Closed			(émit à la fermeture de la fenetre)
+							Closed			(Ã©mit Ã  la fermeture de la fenetre)
 								
-							Resized			(émit quand la fenetre est redimenssionnée)
+							Resized			(Ã©mit quand la fenetre est redimenssionnÃ©e)
 							
-							LostFocus		(émit si l'utilisateur clique en dehors de 
+							LostFocus		(Ã©mit si l'utilisateur clique en dehors de 
 											la fenetre)
 							
-							GainedFocus		(émit après un LostFocus si l'utilisateur 
+							GainedFocus		(Ã©mit aprÃ¨s un LostFocus si l'utilisateur 
 											reclique sur la fenetre)
 							
-							TextEntered		(émit quand un caractère est tapé)
+							TextEntered		(Ã©mit quand un caractÃ¨re est tapÃ©)
 							
-							KeyPressed		(émit quand une touche est appuyée)
+							KeyPressed		(Ã©mit quand une touche est appuyÃ©e)
 
-							KeyReleased		(émit quand une touche est relachée)
+							KeyReleased		(Ã©mit quand une touche est relachÃ©e)
 							
 							MouseWheelMoved			(NE PAS UTILISER, cet event va etre 
-													supprimé dans les prochaines 
+													supprimÃ© dans les prochaines 
 													versions)
 							
-							MouseWheelScrolled		(émit au scroll de la molette)
+							MouseWheelScrolled		(Ã©mit au scroll de la molette)
 
-							MouseButtonPressed		(émit quand le bouton de la sourie 
-													est appuyée)
+							MouseButtonPressed		(Ã©mit quand le bouton de la sourie 
+													est appuyÃ©e)
 							
-							MouseButtonReleased		(émit quand le bouton de la sourie 
-													est relachée)
+							MouseButtonReleased		(Ã©mit quand le bouton de la sourie 
+													est relachÃ©e)
 							
-							MouseMoved		(émit au déplacement de sourie)
+							MouseMoved		(Ã©mit au dÃ©placement de sourie)
 							
-							MouseEntered	(émit quand la sourie entre dans le cadre de 
+							MouseEntered	(Ã©mit quand la sourie entre dans le cadre de 
 											la fenetre)
 
-							MouseLeft		(émit quand la sourie sors du le cadre de la 
+							MouseLeft		(Ã©mit quand la sourie sors du le cadre de la 
 											fenetre)
 							
-							JoystickButtonPressed	(émit quand un bouton du joystick
-													est appuyé)
+							JoystickButtonPressed	(Ã©mit quand un bouton du joystick
+													est appuyÃ©)
 							
-							JoystickButtonReleased	(émit quand un bouton du joystick 
-													est relaché)
+							JoystickButtonReleased	(Ã©mit quand un bouton du joystick 
+													est relachÃ©)
 
-							joystickMoved		(émit quand un joystick se deplace sur un
+							joystickMoved		(Ã©mit quand un joystick se deplace sur un
 												axe)
 													
-							JoystickConnected		(émit quand un joystick est connecté)
+							JoystickConnected		(Ã©mit quand un joystick est connectÃ©)
 													
-							JoystickDisconnected	(émit quand un joystick est
-													déconnecté)
+							JoystickDisconnected	(Ã©mit quand un joystick est
+													dÃ©connectÃ©)
 													
-							TouchBegan		(émit quand quelqu'un pose un doigt sur une 
+							TouchBegan		(Ã©mit quand quelqu'un pose un doigt sur une 
 											surface tactile)
 													
-							TouchMoved		(émit quand quelqu'un deplace un doigt sur 
+							TouchMoved		(Ã©mit quand quelqu'un deplace un doigt sur 
 											une surface tactile)
 													
-							TouchEnded		(émit quand quelqu'un enlève un doigt d'une 
+							TouchEnded		(Ã©mit quand quelqu'un enlÃ¨ve un doigt d'une 
 											surface tactile)
 													
-							SensorChanged	(émit quand la valeur d'un capteur change)
+							SensorChanged	(Ã©mit quand la valeur d'un capteur change)
 													
 							Count			(retourne le nombre de type d'Event...
 											inutile ?)
 
-					Les types sont obtenus avec Event::EventType et chaque événement a son
-					type définis dans event.type 
+					Les types sont obtenus avec Event::EventType et chaque Ã©vÃ©nement a son
+					type dÃ©finis dans event.type 
 
-					(PS, certains événements incluent des informations, voir DOC)
+					(PS, certains Ã©vÃ©nements incluent des informations, voir DOC)
 
 					DOC:
 					https://www.sfml-dev.org/documentation/2.5.1/classsf_1_1Event.php#af41fa9ed45c02449030699f671331d4aa67fd26d7e520bc6722db3ff47ef24941
@@ -426,32 +426,32 @@ int main()
 				Event event;
 				/*
 					
-					Traitement des événements
+					Traitement des Ã©vÃ©nements
 
 					general :
 
-						Lorsqu'un événement a lieux, il est stocké dans une liste 
-						d'Events. la fonction window.pollEvent(event) récupère le premier 
+						Lorsqu'un Ã©vÃ©nement a lieux, il est stockÃ© dans une liste 
+						d'Events. la fonction window.pollEvent(event) rÃ©cupÃ¨re le premier 
 						evenement  de cette liste et le met dans la variable event. S'il
-						n'y a pas d'événements à traiter, elle retourne false.
+						n'y a pas d'Ã©vÃ©nements Ã  traiter, elle retourne false.
 
 					le principe du while :
 
 						Ce pattern de while(window.pollEvent(event)) permet de traiter 
-						chaque événements intervenu depuis l'execution précédente s'il 
+						chaque Ã©vÃ©nements intervenu depuis l'execution prÃ©cÃ©dente s'il 
 						y en a eu.
 
 					l'interrieur du while :
 
 						On devrait utiliser un switch pour tester toutes les valeurs
-						possible pour le type d'événement afin de traiter tous les 
-						événements possibles.
+						possible pour le type d'Ã©vÃ©nement afin de traiter tous les 
+						Ã©vÃ©nements possibles.
 					
 				*/
 				while (window.pollEvent(event))
 				{
 
-					// Fermeture de la fenêtre  => fin du programme
+					// Fermeture de la fenÃªtre  => fin du programme
 					if (event.type == Event::Closed)
 						window.close();
 				}
@@ -468,13 +468,13 @@ int main()
 		
 		Section graphique
 
-		Après avoir choisi ou se trouvent les éléments de la scène à l'instant T,
+		AprÃ¨s avoir choisi ou se trouvent les Ã©lÃ©ments de la scÃ¨ne Ã  l'instant T,
 		on peut les afficher.
 
 		Une solution a essayer :
-			utiliser des tableaux qui identifient les plans de votre scène et
-			dont l'index définis leur priorité d'affichage.
-			Puis dessiner les éléments à l'interrieur d'une boucle for.
+			utiliser des tableaux qui identifient les plans de votre scÃ¨ne et
+			dont l'index dÃ©finis leur prioritÃ© d'affichage.
+			Puis dessiner les Ã©lÃ©ments Ã  l'interrieur d'une boucle for.
 
 	*/
 	#pragma region graphique
@@ -490,13 +490,13 @@ int main()
 			window.clear();
 
 			/*
-				Dessin de tout les éléments qui héritent de la Classe drawable
+				Dessin de tout les Ã©lÃ©ments qui hÃ©ritent de la Classe drawable
 
 				ATTENTION !
-					Plus un élément est appelé tot dans l'ordre des draw, plus 
-					il risque d'etre masqué par d'autres éléments.
+					Plus un Ã©lÃ©ment est appelÃ© tot dans l'ordre des draw, plus 
+					il risque d'etre masquÃ© par d'autres Ã©lÃ©ments.
 
-					par exemple, le ciel/arrièrePlan doit toujours etre dessiné en premier 
+					par exemple, le ciel/arriÃ¨rePlan doit toujours etre dessinÃ© en premier 
 					et (sauf cas exceptionnel) l'interface utilisateur en dernier.
 
 			*/
