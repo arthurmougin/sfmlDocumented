@@ -37,6 +37,7 @@
 #include <iostream>
 #include <SFML/Graphics.hpp>
 #include <SFML/Audio.hpp>
+#include "AnimatedSprite.h"
 
 using namespace std;
 
@@ -64,7 +65,7 @@ int main()
 */
 #pragma region Initialisation
 	/*
-		Créer la fenetre principale
+		Créer la fenêtre principale
 	
 		Ordre des dimensions initiales : largeur, hauteur 
 		paramêtre optionnel : ModeBitsPerPixel 
@@ -80,11 +81,11 @@ int main()
 			Prendre une photo -> window.capture()
 
 			Connaitre et modifier sa position à l'écran (utiles pour des puzzles avec 
-			plusieurs fenetres) 
+			plusieurs fenêtres) 
 				-> window.getPosition()
 				-> window.setPosition(votrePosition)	//Voir doc pour les types requis
 			
-			nommer la fenetre -> setTitle(VotreTitre)	//Voir doc pour les types requis
+			nommer la fenêtre -> setTitle(VotreTitre)	//Voir doc pour les types requis
 
 			...
 
@@ -95,7 +96,7 @@ int main()
 		https://www.sfml-dev.org/documentation/2.5.1/classsf_1_1RenderWindow.php
 		https://www.sfml-dev.org/documentation/2.5.1/classsf_1_1VideoMode.php
 	*/
-	RenderWindow window(VideoMode(800, 800), "SFML works!");
+	RenderWindow window(VideoMode(800, 700), "SFML works!");
 
 	/*
 
@@ -135,7 +136,7 @@ int main()
 	*/
 	Texture texture;
 	//On charge l'image dans la texture, si ca marche, tout va bien, sinon on plante
-	if (!texture.loadFromFile("dragon.png"))
+	if (!texture.loadFromFile("dragonMarchant.png"))
 		return EXIT_FAILURE;
 
 	/*
@@ -188,7 +189,8 @@ int main()
 		https://www.sfml-dev.org/documentation/2.5.1/classsf_1_1Sprite.php#aa795483096b90745b2e799532963e271
 	
 	*/
-	Sprite sprite(texture);
+	IntRect SpriteImage(0, 0, 200, 200);
+	Sprite sprite(texture, SpriteImage);
 
 	/*
 	
@@ -290,6 +292,54 @@ int main()
 		return EXIT_FAILURE;
 	music.play();
 
+
+	/*
+		Gestion du temps
+
+		On utilise la clock pour gérer les animations et les frequences d'execution
+
+		Usage :
+		instantiation
+
+			Clock clock;	// cela démarre le décompte
+
+			Time maintenant = clock.getElapsedTime() // cela permet de savoir combien de temps s'est passé depuis le debut du decompte
+			
+			// on peut comparer maintenant à la durée normale d'execution pour savoir si c'est le moment de faire le calcul du contenu
+			
+			clock.restart() // cela permet de redémarrer le décompte
+
+		
+	*/
+	Clock calculClock;
+	// 60 executions par seconde en miliseconde = 16,6666666
+	Int32 calculFrequence = 16.666;
+
+
+
+
+	/*
+
+		Code personnel pour l'annimation
+
+		Notes :
+			x est l'axe de gauche à droite, y est l'axe de haut en bas
+
+	*/
+	Vector2f largeurfenêtre,temp(window.getSize()),direction;
+	largeurfenêtre = temp;
+	FloatRect spriteBox;
+	Rect<float> bordHaut(0, 0, largeurfenêtre.x, 10),
+		bordBas(0, largeurfenêtre.y - 10, largeurfenêtre.x, 10), 
+		bordDroite(largeurfenêtre.x - 10, 0, 10, largeurfenêtre.y),
+		bordGauche(0, 0, 10, largeurfenêtre.y);
+	
+	float vitesse = 2;
+	int bas, droite;
+	bas = droite = true;
+
+
+
 	// Vous pouvez instancier autant de choses que vous voulez ici
 #pragma endregion
 
@@ -340,7 +390,7 @@ int main()
 
 					les sources d'événement sont :
 						joystik (input, connection...), clavier, sourie(click, mouvement, 
-						molette), capteurs en tout genre, la fenetre en elle meme 
+						molette), capteurs en tout genre, la fenêtre en elle meme 
 						(redimension, saisie de texte, touché) ... (non exaustif)
 
 
@@ -350,15 +400,15 @@ int main()
 
 					La liste exacte des type d'événement est :
 						
-							Closed			(émit à la fermeture de la fenetre)
+							Closed			(émit à la fermeture de la fenêtre)
 								
-							Resized			(émit quand la fenetre est redimenssionnée)
+							Resized			(émit quand la fenêtre est redimenssionnée)
 							
 							LostFocus		(émit si l'utilisateur clique en dehors de 
-											la fenetre)
+											la fenêtre)
 							
 							GainedFocus		(émit après un LostFocus si l'utilisateur 
-											reclique sur la fenetre)
+											reclique sur la fenêtre)
 							
 							TextEntered		(émit quand un caractère est tapé)
 							
@@ -381,10 +431,10 @@ int main()
 							MouseMoved		(émit au déplacement de sourie)
 							
 							MouseEntered	(émit quand la sourie entre dans le cadre de 
-											la fenetre)
+											la fenêtre)
 
 							MouseLeft		(émit quand la sourie sors du le cadre de la 
-											fenetre)
+											fenêtre)
 							
 							JoystickButtonPressed	(émit quand un bouton du joystick
 													est appuyé)
@@ -454,11 +504,62 @@ int main()
 					// Fermeture de la fenêtre  => fin du programme
 					if (event.type == Event::Closed)
 						window.close();
+
+					// Redimension de la fenêtre
+					if (event.type == Event::Resized)
+					{
+						Vector2f  temp(window.getSize());
+						largeurfenêtre = temp;
+
+						Rect<float> bordHaut(0, 0, largeurfenêtre.x, 10),
+							bordBas(0, largeurfenêtre.y - 10, largeurfenêtre.x, 10),
+							bordDroite(largeurfenêtre.x - 10, 0, 10, largeurfenêtre.y),
+							bordGauche(0, 0, 10, largeurfenêtre.y);
+					}
 				}
 
 
 		#pragma endregion
 
+
+		#pragma region comportement
+
+				//cout << endl << clock.getElapsedTime().asMilliseconds() << " " << calculFrequence << endl;
+				if (calculClock.getElapsedTime().asMilliseconds() >= calculFrequence) {
+					cout << endl << calculClock.getElapsedTime().asMilliseconds() << " " << calculFrequence << endl;
+
+					spriteBox = sprite.getGlobalBounds();
+
+					cout  << largeurfenêtre.x << " " << largeurfenêtre.y << endl;;
+
+					cout << "Sprite Box : " << spriteBox.top << " " << spriteBox.left << endl;
+
+
+					if (spriteBox.intersects(bordBas))
+						bas = -1 * vitesse;
+					else if (spriteBox.intersects(bordHaut))
+						bas = 1 * vitesse;
+
+					if (spriteBox.intersects(bordDroite))
+						droite = -1 * vitesse;
+					else if (spriteBox.intersects(bordGauche))
+						droite = 1 * vitesse;
+
+					
+
+					cout << bas << " " << droite << endl;
+
+					direction.x = droite;
+					direction.y = bas;
+
+					sprite.move(0, 0);
+					sprite.move(droite, bas);
+
+					calculClock.restart();
+				}
+
+
+		#pragma endregion
 
 	#pragma endregion
 
@@ -480,14 +581,16 @@ int main()
 	#pragma region graphique
 
 
+
+
 			/*
 				Efface la scene precedente
 
-				On remplace alors toute la fenetre par une seule couleur
+				On remplace alors toute la fenêtre par une seule couleur
 				Par defaut c'est noir.
 
 			*/
-			window.clear();
+			window.clear(Color(0,255,0,255));
 
 			/*
 				Dessin de tout les éléments qui héritent de la Classe drawable
@@ -503,7 +606,7 @@ int main()
 			window.draw(sprite);
 			window.draw(text);
 		
-			//Met a jour la fenetre
+			//Met a jour la fenêtre
 			window.display();
 
 	#pragma endregion
