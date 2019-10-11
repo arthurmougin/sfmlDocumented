@@ -213,7 +213,7 @@ int main()
 	
 	*/
 	Sprite sprite(texture, SpriteImage);
-	
+	sprite.setScale(Vector2f(0.5, 0.5));
 
 	/*
 	
@@ -310,10 +310,10 @@ int main()
 		http://www.openal.org/
 		https://www.sfml-dev.org/documentation/2.5.1/classsf_1_1Music.php
 	*/
-	Music music;
-	if (!music.openFromFile("AMemoryAway.ogg"))
-		return EXIT_FAILURE;
-	music.play();
+	//Music music;
+	//if (!music.openFromFile("AMemoryAway.ogg"))
+	//	return EXIT_FAILURE;
+	//music.play();
 
 
 	/*
@@ -396,7 +396,7 @@ int main()
 	*/
 	float vitesse = 2;
 	int deltaY, deltaX,horizontal,vertical;
-
+	bool iskeyPressed = false;
 
 
 
@@ -570,6 +570,9 @@ int main()
 						bordDroite(largeurfenêtre.x - 10, 0, 10, largeurfenêtre.y),
 						bordGauche(0, 0, 10, largeurfenêtre.y);
 				}
+
+				if (event.type == Event::KeyPressed)
+					iskeyPressed = true;
 			}
 
 
@@ -592,25 +595,47 @@ int main()
 				//on récupère la position du sprite
 				spriteBox = sprite.getGlobalBounds();
 
-				//On spécifie une nouvelle direction quand on intersectionne avec un mur
-				if (spriteBox.intersects(bordBas)) // si on percute le bord bas
-					vertical = -1; 
-				else if (spriteBox.intersects(bordHaut)) // si on percute le bord haut
-					vertical = 1;
+				deltaX = deltaY = 0;
 
-				if (spriteBox.intersects(bordDroite)) // si on percute le bord droite
-					horizontal = -1;
-				else if (spriteBox.intersects(bordGauche)) // si on percute le bord gauche
-					horizontal = 1;
+				
+				if (iskeyPressed) {
+
+					if (Keyboard::isKeyPressed(Keyboard::Left))
+					{
+
+						deltaX = -1;
+					}
+					if (Keyboard::isKeyPressed(Keyboard::Right))
+					{
+						deltaX = 1;
+					}
+					if (Keyboard::isKeyPressed(Keyboard::Up))
+					{
+
+						deltaY = -1;
+
+					}
+					if (Keyboard::isKeyPressed(Keyboard::Down))
+					{
+						deltaY = 1;
+					}
+
+					vitesse = 2;
+					if (deltaY != 0 && deltaX != 0)
+						vitesse = sqrt(pow(vitesse, 2) / 2);
+
+					deltaX = deltaX * vitesse;
+					deltaY = deltaY * vitesse;
+
+					sprite.move(deltaX, deltaY);
 
 
-				// On applique la vitesse
-				deltaX = horizontal * vitesse;
-				deltaY = vertical * vitesse;
+					if (deltaY == 0 && deltaX == 0)
+						iskeyPressed = false;
+				}
 				
 
-				//On applique le mouvement à la sprite
-				sprite.move(deltaX, deltaY);
+				
 
 				calculClock.restart();
 			}
