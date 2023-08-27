@@ -1,4 +1,4 @@
-Bonjour, ceci est le dossier de ma doccumentation de SFML
+Au cours de mon Master, nous avons développé un jeu en SFML. ceci est le dossier de ma doccumentation pour ce projet
 
 Pour installer :
  1. Créez un dossier Visual Studio vierge.
